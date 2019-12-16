@@ -1,7 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <Authors>Yaroslav Krivolapov </Authors>
+        <Company>Yaroslav Krivolapov</Company>
+        <Product>My Report</Product>
+        <AssemblyVersion>1.0</AssemblyVersion>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
