@@ -12,8 +12,8 @@ namespace MyReport
         private const string NameCommiter = @"Jacob Kirkwood";
         private const string WorkingDirectory = @"C:\Projects\WPS";
         private const string Url = @"https://pts.bbconsult.co.uk/taskEditor?id=";
-        private const string DescriptionTitlePrefix = "\t - ";
-        private const string DescriptionPrefix = "\t\t - ";
+        private const string DescriptionTitlePrefix = "\t- ";
+        private const string DescriptionPrefix = "\t\t- ";
         private const string GitPath = "git.exe";
         private const string FormatDate = "dd/MM/yyyy";
         private const string ReportPath = @"C:\Users\Admin\Desktop\Reports.txt";
@@ -49,10 +49,10 @@ namespace MyReport
                 var words = commit.Split(@" ");
                 var firstWord = words[0];
                 if (firstWord == "Merge") continue;
-                firstWord = firstWord.Replace("n","");
-
                 var decryption = DescriptionPrefix +
                                  commit.Substring(firstWord.Length + 1, commit.Length - firstWord.Length - 1);
+                firstWord = firstWord.Replace("n", "");
+                
                 if (lastNumber != firstWord)
                 {
                     result.Add(DescriptionTitlePrefix + Url + firstWord);
