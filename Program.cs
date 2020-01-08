@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace MyReport
 {
@@ -40,19 +41,23 @@ namespace MyReport
         private static List<string> ParseCommits(string[] commits)
         {
             var lastNumber = "";
-            var result = new List<string> {DateTime.Now.ToString(FormatDate)};
+            var result = new List<string> {"\n" + DateTime.Now.ToString(FormatDate)};
 
             foreach (var commit in commits)
             {
                 if (commit == "") continue;
                 var words = commit.Split(@" ");
+                var firstWord = words[0];
+                if (firstWord == "Merge") continue;
+                firstWord = firstWord.Replace("n","");
+
                 var decryption = DescriptionPrefix +
-                                 commit.Substring(words[0].Length + 1, commit.Length - words[0].Length - 1);
-                if (lastNumber != words[0])
+                                 commit.Substring(firstWord.Length + 1, commit.Length - firstWord.Length - 1);
+                if (lastNumber != firstWord)
                 {
-                    result.Add(DescriptionTitlePrefix + Url + words[0]);
+                    result.Add(DescriptionTitlePrefix + Url + firstWord);
                     result.Add(decryption);
-                    lastNumber = words[0];
+                    lastNumber = firstWord;
                 }
                 else result.Add(decryption);
             }
