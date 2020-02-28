@@ -8,22 +8,38 @@ namespace MyReport
 {
     static class Program
     {
+        // git settings
         private const string Command = @"log --pretty=tformat:""%s"" --since=""{0}"" --committer=""{1}""";
         private const string NameCommiter = @"Jacob Kirkwood";
         private const string WorkingDirectory = @"C:\Projects\WPS";
-        private const string Url = @"https://pts.bbconsult.co.uk/taskEditor?id=";
-        private const string DescriptionTitlePrefix = "\t- ";
-        private const string DescriptionPrefix = "\t\t- ";
         private const string GitPath = "git.exe";
         private const string FormatDate = "dd/MM/yyyy";
         private const string ReportPath = @"C:\Users\Admin\Desktop\Reports.txt";
+
+        // format settings
+        private const string TitleReport = "Daily report ";
+        private const string TitlePrefix = "    - ";
+        private const string DescriptionPrefix = "        - ";
+        private const string TaskSimbol = "n";
+        private const string MergeStr = "Merge";
+        private const string FixStr = "fix";
+
+        static readonly List<Task> Tasks = new List<Task>();
 
         static void Main(string[] args)
         {
             var log = GetGitLog();
             var commits = log.Split("\n");
-            var result = ParseCommits(commits);
-            WriteToFile(result);
+
+            ParseCommits(commits);
+
+            var lines = new List<string> {"\n" + TitleReport + DateTime.Now.ToString(FormatDate)};
+            foreach (var task in Tasks)
+            {
+                lines.Add(TitlePrefix + task.Url + " - " + task.Status.GetDisplayName());
+                lines.AddRange(task.Items.Select(item => DescriptionPrefix + item));
+            }
+            WriteToFile(lines);
         }
 
         private static void WriteToFile(List<string> result)
@@ -38,31 +54,36 @@ namespace MyReport
             writer.Close();
         }
 
-        private static List<string> ParseCommits(string[] commits)
+        private static void ParseCommits(string[] commits)
         {
-            var lastNumber = "";
-            var result = new List<string> {"\n" + DateTime.Now.ToString(FormatDate)};
-
-            foreach (var commit in commits)
+            foreach (var commit in commits.Reverse())
             {
                 if (commit == "") continue;
                 var words = commit.Split(@" ");
-                var firstWord = words[0];
-                if (firstWord == "Merge") continue;
-                var decryption = DescriptionPrefix +
-                                 commit.Substring(firstWord.Length + 1, commit.Length - firstWord.Length - 1);
-                firstWord = firstWord.Replace("n", "");
-                
-                if (lastNumber != firstWord)
-                {
-                    result.Add(DescriptionTitlePrefix + Url + firstWord);
-                    result.Add(decryption);
-                    lastNumber = firstWord;
-                }
-                else result.Add(decryption);
+                var numberTask = words[0];
+                if (numberTask == MergeStr) continue;
+                var decryption = commit.Substring(numberTask.Length + 1, commit.Length - numberTask.Length - 1);
+
+                var status = numberTask.Contains(TaskSimbol) ? Status.Completed : Status.InProgress;
+                numberTask = numberTask.Replace(TaskSimbol, "");
+
+                AddItemToTask(numberTask, decryption, status);
+            }
+        }
+
+        private static void AddItemToTask(string numberTask, string decryption, Status status)
+        {
+            var index = Tasks.FindIndex(t => t.Number == numberTask);
+            if (index == -1)
+            {
+                Tasks.Add(new Task() {Number = numberTask});
+                index = Tasks.FindIndex(t => t.Number == numberTask);
             }
 
-            return result;
+            if (Tasks[index].Items.Count == 1 && Tasks[index].Items.First().StartsWith(FixStr)) status = Status.Fixed;
+
+            Tasks[index].Status = status;
+            Tasks[index].Items.Add(decryption);
         }
 
         private static string GetGitLog()
