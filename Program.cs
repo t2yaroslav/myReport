@@ -64,7 +64,7 @@ namespace MyReport
                 if (numberTask == MergeStr) continue;
                 var decryption = commit.Substring(numberTask.Length + 1, commit.Length - numberTask.Length - 1);
 
-                var status = numberTask.Contains(TaskSimbol) ? Status.Completed : Status.InProgress;
+                var status = numberTask.Contains(TaskSimbol) ?Status.InProgress : Status.Completed;
                 numberTask = numberTask.Replace(TaskSimbol, "");
 
                 AddItemToTask(numberTask, decryption, status);
