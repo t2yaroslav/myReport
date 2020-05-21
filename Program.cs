@@ -10,6 +10,7 @@ namespace MyReport
     {
         // git settings
         private const string Command = @"log --pretty=tformat:""%s"" --since=""{0}"" --committer=""{1}""";
+        private const string Period = "1 day ago";
         private const string NameCommiter = @"Jacob Kirkwood";
         private const string WorkingDirectory = @"C:\Projects\WPS";
         private const string GitPath = "git.exe";
@@ -88,8 +89,7 @@ namespace MyReport
 
         private static string GetGitLog()
         {
-            var yesterday = DateTime.Now.AddDays(-1).ToString(FormatDate);
-            var output = RunProcess(string.Format(Command, yesterday, NameCommiter));
+            var output = RunProcess(string.Format(Command, Period, NameCommiter));
             return output;
         }
 
